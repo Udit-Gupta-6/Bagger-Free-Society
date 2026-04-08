@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Baggger Free Society</title>
+     <!--------------------- eye cdn link --------->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">  
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
+        </script>
+
+
+    <script>
+        $(document).ready(function () {
+
+            $("#txtSignupEmail").blur(function () {
+
+                let email = $(this).val();
+
+                let regEx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                let resp = regEx.test(email);
+                if (resp == true)
+                    $("#errSignupEmail").html("Valid").addClass("ok").removeClass("not-ok");
+                else
+                    $("#errSignupEmail").html("Invalid").addClass("not-ok").removeClass("ok");
+            })
+
+            $("#txtSignupPwd").blur(function () {
+                let regex = /^(?=.[a-z])(?=.[A-Z])(?=.*\d).{8,}$/;
+                let pwd = $("#txtSignupPwd").val();
+
+                if (regex.test(pwd))
+                    $("#errSignupPwd").html("Valid").addClass("ok").removeClass("not-ok");
+                else
+                    $("#errSignupPwd").html("Invalid").addClass("not-ok").removeClass("ok");
+            });
+       
+
+        //---------------------eye on click btn---------------
+        $(".fa-solid").click(function()
+            {
+                if($("#txtSignupPwd").prop("type")=="password")
+                    {
+                      $("#txtSignupPwd").prop("type","text");
+                      $(".fa-solid").addClass("fa-eye-low-vision").removeClass("fa-eye");;
+                   }
+                   else
+                   {
+                      $("#txtSignupPwd").prop("type","password");
+                      $(".fa-solid").removeClass("fa-eye-low-vision").addClass("fa-eye");;
+                   }
+            })
+      
+               $(".fa-solid").click(function()
+            {
+                if($("#txtLoginPwd").prop("type")=="password")
+                    {
+                      $("#txtLoginPwd").prop("type","text");
+                      $(".fa-solid").addClass("fa-eye-low-vision").removeClass("fa-eye");;
+                   }
+                   else
+                   {
+                      $("#txtLoginPwd").prop("type","password");
+                      $(".fa-solid").removeClass("fa-eye-low-vision").addClass("fa-eye");;
+                   }
+            })
+        });
+
+        $(document).ready(function () {              // <!-- AJAX-->
+
+            $("#btnSignUp").click(function () {     //<!--------------SIGNUP AJAX-----------------
+
+                // let today = new Date().toISOString().slice(0,10);
+
+                let obj = {
+                    url: "/recordTable",
+                    type: "GET",   // because server me app.get hai
+                    data: {
+                        txtEmail: $("#txtSignupEmail").val(),
+                        txtPwd: $("#txtSignupPwd").val(),
+                        txtUtype: $("#txtSignupUtype").val(),
+                        // txtDos:today // current date
+                    }
+                };
+
+                $.ajax(obj)
+                    .then(function (resp) {
+                        alert(resp);
+                    })
+                    .fail(function (err) {
+                        alert(err.message);
+                    });
+
+            });
+
+            $("#btnLoginSubmit").click(function () {      //<!---------------LOGIN AJAX-----------
+
+                let obj = ({
+                    url: "/checkUtype",
+                    type: "GET",
+                    data: {
+                        txtEmailL: $("#txtLoginEmail").val(),
+                        txtPwdL: $("#txtLoginPwd").val(),
+                    }
+                })
+
+                $.ajax(obj).then(function (resp) {
+            
+                    // alert(resp)
+                    
+
+                    //global object(named as avtiveuser) used to store the email 
+                    // localStorage.setItem("activeuser",$("#txtLoginEmail").val())
+                    if(resp=="Volantier")
+                        {
+                            localStorage.setItem("activeuser", $("#txtLoginEmail").val())
+                            window.location.href="/volDash";
+                        }
+
+                    if(resp =="Citizen")
+                        {
+                            localStorage.setItem("activeuser",$("#txtLoginEmail").val())
+                            window.location.href="/citizenDash"
+                        }
+
+                }).fail(function (err) {
+                    alert(err.message)
+                })
+            })
+
+        });
+
+    </script>
+
+    <style>
+        .ok {
+            color: green;
+            border: 1px green solid;
+            border-radius: 10px;
+            text-align: center;
+            padding: 2px;
+            width: 50px;
+            margin-top: 2px;
+        }
+
+        .not-ok {
+            color: red;
+            border: 1px red solid;
+            border-radius: 10px;
+            text-align: center;
+            padding: 2px;
+            width: 50px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+  <!-- <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+
+      <a class="navbar-brand" href="#">
+        <img src="../projPhotos/bagger logo.jpg" height="50px" width="50px"> Bagger Free Society
+      </a>
+      
+      <ul class="nav justify-content-end">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Active</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+        </li>
+        </ul>
+
+    </div>
+  </nav> -->
+
+
+
+
+
+
+
+
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand fs-2" href="#">
+                <img src="../projPhotos/bagger logo.jpg" alt="Logo" width="50" height="50" class="d-inline-block align-text-top">
+                Baggers Free Society           
+            </a>           
+
+            <!-- --------------SIGNUP BUTTONS----------------- -->
+            <ul class="nav justify-content-end">
+
+                <li class="nav-item">
+                <a href="#bottom" class="btn btn-light text-dark">
+                Reach Us
+                </a>
+            </li>
+                
+                <li class="nav-item">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleSignupModal">
+                        SignUp
+                    </button>
+                </li>
+                
+                <li class="nav-item">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleLoginModal">
+                    Login
+                     </button>
+                </li>
+            </ul>
+    </nav>
+
+
+
+<!------------------------------CAROUSEL------------------------------->
+<div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="../projPhotos/baggerindex2.png" class="d-block w-100" alt="..." height="400px">
+    </div>
+
+    <div class="carousel-item">
+      <img src="../projPhotos/beggerIndex.png" class="d-block w-100" alt="..." height="400px">
+    </div>
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+
+
+<div class="row">
+    <div class="col-md-12 fs-2 bg-danger text-white">
+        <center>
+             Our services
+        </center>
+    </div>
+</div>
+
+<!----------------------------CARDS---------------------------->
+<div class="container">
+<div class="row">
+    <div class="col-md-3">
+        <div class="card" >
+            <img src="../projPhotos/beggar card1.jpeg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h6>Profile Registration Service</h6>
+                        <p>
+                        Register individuals with identify.
+                        details and skills to connect them
+                        with job opportunites.
+                        </p>
+                </div>
+        </div>
+    </div>
+
+
+    <div class="col-md-3">
+        <div class="card">
+            <img src="../projPhotos/bagger card2.jpeg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h6>Service & Emergency Help</h6>
+                        <p>
+                        Providing immediate support and essential 
+                        services to individuals in urgent need,
+                        ensuring safety, care, and timely
+                        assistance.
+                        </p>
+                </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <img src="../projPhotos/bagger card 3.jpeg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h6>Find Employment Opportunites.</h6>
+                        <p>
+                            Connecting individuals with meaningful 
+                            employment opportunities to build a 
+                            stable and independent future
+                        </p>
+                </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <img src="../projPhotos/bagger card 4.jpeg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h6>From Baggers to earning</h6>
+                        <p>
+                        Helping individuals transition 
+                        from begging to sustainable 
+                        earning through skills and
+                        opportunities.
+                    </p>
+                </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12 fs-2 bg-danger text-white">
+        <center>
+             Meet the Deviloper
+        </center>
+    </div>
+</div>
+
+<div class="container">
+<div class="row">
+    <div class="col-md-4 p-2">
+        <img src="..//projPhotos/developer.jpeg" height="350px" width="400px">
+    </div>
+
+    <div class="col-md-6">
+        <br>
+        <h3>Udit Gupta</h3>
+        <br>
+
+        <p class="fs-6">Hey there i am Udit a full stack developer. Yes this site is made by me. I am currently pursuing BCA from Govt Rajindra College Bathinda
+            and with that have a great coding skills too. </p>
+
+            <p>
+          Thanks to Mr. Rajesh K.Bansal for his guidence and support.
+        </p>
+
+    </div>
+</div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 fs-2 bg-danger text-white">
+        <center>
+             Reach us
+        </center>
+    </div>
+</div>
+
+<div class="container">
+<div class="p-2" style="width: 100%; height: 300px;">
+        <iframe width="100%" height="100%" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3447.8807340362614!2d74.94975317539755!3d30.211951274839702!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391732a4f07278a9%3A0x4a0d6293513f98ce!2sBanglore%20Computer%20Education!5e0!3m2!1sen!2sin!4v1766838454610!5m2!1sen!2sin" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12 fs-5 bg-danger text-white" id="bottom">
+        <center>
+            © Copyright reserved
+        </center>
+    </div>
+</div>
+
+
+
+
+
+
+
+    <!------------ Signup Modal ------------>
+
+    <div class="modal fade" id="exampleSignupModal" tabindex="-1" aria-labelledby="exampleSignupModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleSignupModalLabel">Signup Here</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form method="get"> <!--  under ka form -->
+                        <div class="mb-3">
+                            <label for="txtSignupEmail" class="form-label">Email address</label>
+                            <input type="email" id="txtSignupEmail" name="txtSignupEmail" class="form-control"
+                                aria-describedby="emailHelp" required>
+                            <div id="errSignupEmail"></div>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="txtSignupPwd" class="form-label">Password</label>
+                            <input type="password" name="txtSignupPwd " class="form-control" id="txtSignupPwd" required>
+                            <i class="fa-solid fa-eye fa-bounce"></i>
+                            <div class="err" id="errSignupPwd"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <select id="txtSignupUtype" name="txtSignupUtype" class="form-select" required>
+                                <option value="none">Select User Type</option>
+                                <option value="Volantier">Volantier</option>
+                                <option value="Citizen">Citizen</option>
+                            </select>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="button" id="btnSignUp" class="btn btn-dark w-100 mt-3">Sign Up</button>
+                            <!--using ajax-->
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-------------Login Modal----------- -->
+
+    <div class="modal fade" id="exampleLoginModal" tabindex="-1" aria-labelledby="exampleLoginModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleLoginModalLabel">Login Here</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form  method="get"> <!----------  under ka form -------------->
+
+                        <div class="card" style="width: 10rem; height: 10rem; margin: auto;">
+                            <img src="../projPhotos/profile.jpg" class="card-img-top" alt="...">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="txtLoginEmail" class="form-label">Email address</label>
+                            <input type="email" id="txtLoginEmail" name="txtLoginEmail" class="form-control"
+                                aria-describedby="emailHelp" required>
+                            <div id="errEmail"></div>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="txtLoginPwd" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="txtLoginPwd" name="txtLoginPwd" required>
+                            <i class="fa-solid fa-eye fa-bounce"></i>
+
+                            <div class="err" id="errPwd"></div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="button" id="btnLoginSubmit" class="btn btn-dark w-100 mt-3">Login</button>
+                            <!--using ajax-->
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+</body>
+
+</html>

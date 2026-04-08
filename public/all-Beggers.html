@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>All Beggers</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+
+     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous">
+    </script>
+
+    <script>
+        var module=angular.module("beggerModule",[]);
+        module.controller("beggerController",function($scope,$http)
+        {
+            $scope.jsonAry=[];
+
+            $scope.doFetchBeggers=function()
+                {
+                    $http.get("angular-fetchBeggers").then(allGood,errKuch)
+                    function allGood(result)
+                        {
+                            alert(JSON.stringify(result.data));
+                            $scope.jsonAry=result.data;
+                        }
+
+                    function errKuch(err)
+                        {
+                            alert(err);
+                        }
+                }
+        })
+
+    </script>
+</head>
+<body ng-app="beggerModule" ng-controller="beggerController">
+
+    <div class="container mt-2">
+
+        <!-------------HEADING---------------->
+        <div class="row bg-primary text-white text-center">
+            <h2>All Beggers Records</h2>
+        </div>
+
+        <!--------------FETCH BTN----------------->
+        <div class="text-center mt-2 mb-2">
+            <button class="btn btn-success" ng-click="doFetchBeggers()">Fetch Beggers</button>
+        </div>
+       
+        <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Sr.No</th> <th>vol Ref Id</th> <th>Name</th> <th>Age</th> <th>Gender</th> <th>Address</th> <th>City</th> <th>Work</th> </th><th>Number</th> <th>Proof</th> <th>Proof No</th>
+                </tr>
+            </thead>    
+
+        <tbody>
+           <tr ng-repeat="obj in jsonAry" height="50">
+                    
+                        <td>{{$index+1}}</td>
+                        <td>{{obj.volRefId}}</td>
+                        <td>{{obj.baggName}}</td>
+                        <td>{{obj.baggAge}}</td>
+                        <td>{{obj.baggGender}}</td>
+                        <td>{{obj.baggAddress}}</td>
+                        <td>{{obj.baggCity}}</td>
+                        <td>{{obj.baggWork}}</td>
+                        <td>{{obj.baggNumber}}</td>
+                        <td>{{obj.baggProof}}</td>
+                        <td>{{obj.baggProofNo}}</td>
+            </tr>
+        </tbody>
+        </table>
+        </div>
+    </div>
+</body>
+</html>

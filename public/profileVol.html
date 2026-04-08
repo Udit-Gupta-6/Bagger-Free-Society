@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Volantier login</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>   
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous">
+    </script>
+    
+    <script>
+        function doPrev(event, fileId)
+            {
+                const file=event.target.files[0];
+                if(file != null)
+                    document.getElementById(fileId).src=URL.createObjectURL(file);
+            }
+    </script>
+
+    <script>
+        $(document).ready(function()
+        {
+            $("#volType").change(function()             //hidden button
+                {
+                    if($("#volType").val()== "NGO")
+                        $("#ifNgo").css("display","block")
+
+                    else
+                        $("#ifNgo").css("display","none");
+                })
+
+            $("#btnFetch").click(function(){
+
+                let obj={
+                url: "/fetchData",
+                data: {
+                    volEmail: $("#volEmail").val()
+                }
+            }
+
+        $.ajax(obj).then(function(respJsonAry){
+
+            alert(JSON.stringify(respJsonAry));
+
+            // alert(respJsonAry[0].txtPwd);       // ye colum name liye hai
+            // alert(respJsonAry[0].txtMob);
+            // alert(respJsonAry[0].TxtDob);
+            // alert(respJsonAry[0].qualification);
+
+            $("#volName").val(respJsonAry[0].volName);             //fething values using ajax
+            $("#volNumber").val(respJsonAry[0].volNumber);
+            $("#volAddress").val(respJsonAry[0].volAddress);
+            $("#volCity").val(respJsonAry[0].volCity);
+            $("#volGender").val(respJsonAry[0].volGender);
+            $("#volOccu").val(respJsonAry[0].volOccu);
+            // $("#volType").val(respJsonAry[0].volType);
+            $("#volType").val(respJsonAry[0].volType).trigger("change");
+
+            $("#volNgoNo").val(respJsonAry[0].volNgoNo);
+            
+            $("#volAdhar").prop("src",respJsonAry[0].volAdhar);
+            $("#volProfilePic").prop("src",respJsonAry[0].volProfilePic);
+
+        }).fail(function(err){  
+            alert(err.message)
+         })
+    })
+ })
+    </script>
+</head>
+<body>
+    <div class="row">
+            <div class="col-md-12 fs-2 bg-danger text-white">
+                <center>
+                     Volantier Profile Form
+                </center>
+            </div>
+        </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+        
+    <form action="/voluntier-login" method="post" enctype="multipart/form-data">
+
+        <div class="row">
+            <div class="col-md-8">
+                <label for="volEmail" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="volEmail" name="volEmail" aria-describedby="emailHelp" required>
+            </div>
+
+            <div class="col-md-2  mt-4">
+                      <input type="button" id="btnFetch" name="btnFetch" value="Fetch" >
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5">
+                <label for="volName" class="form-label">Name</label>
+                <input type="text" class="form-control" id="volName" name="volName" required>
+            </div>
+
+        <div class="col-md-5">
+            <label for="volNumber" class="form-label">Contact No.</label>
+            <input type="number" class="form-control" id="volNumber" name="volNumber" required>
+        </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <label for="volAddress" class="form-label">Address</label>
+                <input type="text" class="form-control" id="volAddress" name="volAddress" required>
+            </div>
+
+            <div class="col-md-3">
+                <label for="volCity" class="form-label">City</label>
+                <input type="text" class="form-control" id="volCity" name="volCity" required>
+            </div>
+        </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <label for="volGender" class="form-label">Gender</label>
+            <select id="volGender" name="volGender" class="form-select" required>
+                <option value="" selected>Choose...</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="other">other</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="volOccu" class="form-label">Occupation</label>
+            <select id="volOccu" name="volOccu" class="form-select" required>
+                <option value="" selected>Choose...</option>
+                <option value="Office">Office</option>
+                <option value="House">House</option>
+                <option value="Govt Job">Govt Job</option>
+                <option value="Business">Business</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <label for="volType" class="form-label">Type of Volantier</label>
+            <select id="volType" name="volType" class="form-select" required>
+                <option value="" selected>choose</option>
+                <option value="Individual">Individual</option>
+                <option value="NGO">NGO</option>
+            </select>
+        </div>
+
+        <div class="col-md-3" id="ifNgo" style="display: none;">
+            <label for="volNgoNo" class="form-label">Registration No</label>
+            <input type="text" id="volNgoNo" name="volNgoNo" class="form-control" required>
+        </div>        
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label for="">AdhaaCard no</label>
+        </div>
+
+        <div class="col-md-4">
+            <img src="" id="volAdhar"  width="120px" height="120px">
+        </div>   
+
+        <input type="file" name="fileAdhar" id="fileAdhar" onchange="doPrev(event,'volAdhar');">
+
+
+        
+        <div class="col-md-2">
+            <label for="">Profile Pic</label>
+        </div>
+    
+        <div class="col-md-4">
+             <img src="" id="volProfilePic" width="120px" height="120px">
+        </div>
+
+        <input type="file" name="filePic" id="filePic" onchange="doPrev(event,'volProfilePic');">
+
+    </div>
+          
+
+   <div class="row">
+    <div class="col-md-4 ">
+        <button type="submit" class="btn btn-dark w-100 mt-3">Submit</button>
+    </div>
+
+    <div class="col-md-4">
+        <button type="submit" formaction="/doUpdate" class="btn btn-dark w-100 mt-3">Update</button>
+    </div>
+   </div>
+</form>
+</div>
+</div>
+</div>
+</body>
+</html>

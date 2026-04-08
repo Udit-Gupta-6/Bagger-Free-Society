@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Citizen DashBoard</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">  
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>   
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous">
+    </script>
+
+    <script>
+      $(document).ready(function(){              // <!-- AJAX-->
+
+            $("#btnChange").click(function(){
+
+                let obj = {
+                    url: "/updateCitizenPass",
+                    type: "GET",   // because server me app.get hai
+                    data: {
+                        settingEml: $("#settingEml").val(),
+                        oldPwd: $("#oldPwd").val(),
+                        newPwd: $("#newPwd").val(),
+                    }
+                };
+
+                $.ajax(obj)
+                .done(function(resp){
+                    alert(resp);
+                })
+                .fail(function(err){
+                    alert("Error occurred");
+                });
+
+            });
+        });
+
+      $(document).ready(function(){ 
+          alert(localStorage.getItem("activeuser"))
+
+      });
+
+    </script>
+</head>
+<body>      <!------------------------ Navbar---------------------------------------->
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+
+      <a class="navbar-brand" href="#">
+        <img src="../projPhotos/bagger logo.jpg" height="50px" width="50px"> Bagger Free Society
+      </a>
+      
+      <!-- <span class="navbar-text position-absolute top-50 start-50 translate-middle fw-bold fs-1"> Bagger Free Society </span> -->
+    </div>
+  </nav>
+
+<div class="row bg-danger text-white">
+  <div class="col-md-12">
+      <center>
+        <span class="fs-3">Citizen DashBoard</span>
+           </center>
+    </div>    
+</div>
+             <!----------------------Cards-------------------------->
+<div class="container">
+  <div class="row mt-1">
+    <div class="col-md-3">
+      <div class="card">
+        <img src="../projPhotos/profile.jpg" width="250px" height="250px" class="card-img-top" alt="...">
+          <div class="card-body text-center">
+
+            <a href="profileCitizen.html" class="btn btn-primary rounded-pill px-4 py-2">
+              Profile
+            </a>
+            
+            <!-- no need for button as more API have to be made  -->
+            <!-- <button type="button" id="btnProfile" name="btnProfile" class="btn btn-info">Profile</button> -->
+          </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card">
+        <img src="../projPhotos/details.jpg" width="250px" height="250px" class="card-img-top" alt="...">
+          <div class="card-body text-center">
+
+            <a href="find-worker.html" class="btn btn-primary rounded-pill px-4 py-2">
+                Find Workers
+            </a>    
+
+            <!-- <button type="button" id="btnFindWorker" name="btnFindWorker" class="btn btn-info">Find Workers</button> -->
+          </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card">
+        <img src="../projPhotos/logOut.jpeg" width="250px" height="250px" class="card-img-top" alt="...">
+          <div class="card-body text-center">
+
+            <a href="/" class="btn btn-primary rounded-pill px-4 py-2">
+                Log Out
+            </a>
+
+            <!-- <button type="button" id="btnLogout" name="btnLogout" class="btn btn-info">Log out</button> -->
+          </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card">
+        <img src="../projPhotos/setting 2.jpeg" width="250px" height="250px" class="card-img-top" alt="...">
+          <div class="card-body text-center">
+            <button type="button" id="btnSetting" name="btnSetting" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#settingModal">Settings</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+                      <!-----  setting modal------->   
+<div class="modal fade" id="settingModal" tabindex="-1" aria-labelledby="exampleSettingModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleSettingModalLabel">Settings</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+      <form>                        
+        <div class="mb-3">
+            <label for="settingEml" class="form-label">Email address</label>
+            <input type="email" id="settingEml" name="settingEml" class="form-control" aria-describedby="emailHelp" required>
+            <div id=""></div>
+
+    </div>
+
+    <div class="mb-3">
+        <label for="oldPwd"  class="form-label">Old Password</label>
+        <input type="password" name="oldPwd "class="form-control" id="oldPwd" required>
+        <div class="err" id=""></div>
+    </div>
+
+     <div class="mb-3">
+        <label for="newPass" class="form-label">New Password</label>
+        <input type="password" name="newPwd" class="form-control" id="newPwd" required>
+        <div class="err" id=""></div>
+    </div>
+
+    <div class="text-center">
+        <button type="button" id="btnChange" class="btn btn-primary" >Change Password</button>      <!--using ajax-->
+    </div>
+</form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
