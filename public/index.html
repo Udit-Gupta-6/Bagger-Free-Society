@@ -1,46 +1,145 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <title>Baggger Free Society</title>
-     <!--------------------- eye cdn link --------->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">  
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
-        </script>
-
-
     <script>
+
+        let pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
         $(document).ready(function () {
 
+            // ----------------------------- SiGNUP EMAIL VALIDATION -------------------------
             $("#txtSignupEmail").blur(function () {
 
                 let email = $(this).val();
 
-                let regEx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                let resp = regEx.test(email);
+                let resp = emailRegex.test(email);
                 if (resp == true)
                     $("#errSignupEmail").html("Valid").addClass("ok").removeClass("not-ok");
                 else
                     $("#errSignupEmail").html("Invalid").addClass("not-ok").removeClass("ok");
             })
 
+            // ------------------------------- SIGNUP PASS VALIDATION -------------------------
             $("#txtSignupPwd").blur(function () {
-                let regex = /^(?=.[a-z])(?=.[A-Z])(?=.*\d).{8,}$/;
+                
                 let pwd = $("#txtSignupPwd").val();
 
-                if (regex.test(pwd))
+                if (pwdRegex.test(pwd))
                     $("#errSignupPwd").html("Valid").addClass("ok").removeClass("not-ok");
                 else
                     $("#errSignupPwd").html("Invalid").addClass("not-ok").removeClass("ok");
             });
+
+            // ------------------------------- LOGIN EMAIL VALIDATION -------------------------
+            $("#txtLoginEmail").blur(function () {
+                let email = $(this).val();
+
+                if (emailRegex.test(email))
+                    $("#errEmail").html("Valid").addClass("ok").removeClass("not-ok");
+                else
+                    $("#errEmail").html("Invalid").addClass("not-ok").removeClass("ok");
+            });
+
+            // ------------------------------ LOGIN PASSWORD VALIDATION ----------------
+            $("#txtLoginPwd").blur(function () {
+                let pwd = $(this).val();
+
+                if (pwdRegex.test(pwd))
+                    $("#errPwd").html("Valid").addClass("ok").removeClass("not-ok");
+                else
+                    $("#errPwd").html("Invalid").addClass("not-ok").removeClass("ok");
+            });
        
+
+ //<!-----------------------------------SIGNUP AJAX--------------------------------
+            $("#btnSignUp").click(function () {
+
+                    let email = $("#txtSignupEmail").val();
+                    let pwd = $("#txtSignupPwd").val();
+
+                    let emailValid = emailRegex.test(email);
+                    let pwdValid = pwdRegex.test(pwd);
+
+                    if (!emailValid || !pwdValid) {
+                        alert("Please enter valid Email and Password!");
+                        return; 
+                    }
+
+                    //  Only runs if both valid
+                    let obj = {
+                        url: "/recordTable",
+                        type: "GET",
+                        data: {
+                            txtEmail: email,
+                            txtPwd: pwd,
+                            txtUtype: $("#txtSignupUtype").val(),
+                        }
+                    };
+
+                    $.ajax(obj)
+                        .then(function (resp) {
+                            alert(resp);
+                        })
+                        .fail(function (err) {
+                            alert(err.message);
+                        });
+                });
+
+            //<!---------------------------LOGIN AJAX-----------------------
+            $("#btnLoginSubmit").click(function () {      
+
+               let email = $("#txtLoginEmail").val();
+                let pwd = $("#txtLoginPwd").val();
+
+                let emailValid = emailRegex.test(email);
+                let pwdValid = pwdRegex.test(pwd);
+
+                if (!emailValid || !pwdValid) {
+                    alert("Invalid Email or Password format!");
+                    return; 
+                }
+
+                let obj = {
+                    url: "/checkUtype",
+                    type: "GET",
+                    data: {
+                        txtEmailL: email,
+                        txtPwdL: pwd,
+                    }
+                };
+
+                $.ajax(obj).then(function (resp) {
+            
+                    // alert(resp)
+                    
+                    //global object(named as avtiveuser) used to store the email 
+                    // localStorage.setItem("activeuser",$("#txtLoginEmail").val())
+                    if(resp=="Volantier")
+                        {
+                            localStorage.setItem("activeuser", $("#txtLoginEmail").val())
+                            window.location.href="/volDash";
+                        }
+
+                    if(resp =="Citizen")
+                        {
+                            localStorage.setItem("activeuser",$("#txtLoginEmail").val())
+                            window.location.href="/citizenDash"
+                        }
+
+                }).fail(function (err) {
+                    alert(err.message)
+                })
+            })
+
+
 
         //---------------------eye on click btn---------------
         $(".fa-solid").click(function()
@@ -72,67 +171,8 @@
             })
         });
 
-        $(document).ready(function () {              // <!-- AJAX-->
-
-            $("#btnSignUp").click(function () {     //<!--------------SIGNUP AJAX-----------------
-
-                // let today = new Date().toISOString().slice(0,10);
-
-                let obj = {
-                    url: "/recordTable",
-                    type: "GET",   // because server me app.get hai
-                    data: {
-                        txtEmail: $("#txtSignupEmail").val(),
-                        txtPwd: $("#txtSignupPwd").val(),
-                        txtUtype: $("#txtSignupUtype").val(),
-                        // txtDos:today // current date
-                    }
-                };
-
-                $.ajax(obj)
-                    .then(function (resp) {
-                        alert(resp);
-                    })
-                    .fail(function (err) {
-                        alert(err.message);
-                    });
-
-            });
-
-            $("#btnLoginSubmit").click(function () {      //<!---------------LOGIN AJAX-----------
-
-                let obj = ({
-                    url: "/checkUtype",
-                    type: "GET",
-                    data: {
-                        txtEmailL: $("#txtLoginEmail").val(),
-                        txtPwdL: $("#txtLoginPwd").val(),
-                    }
-                })
-
-                $.ajax(obj).then(function (resp) {
-            
-                    // alert(resp)
-                    
-
-                    //global object(named as avtiveuser) used to store the email 
-                    // localStorage.setItem("activeuser",$("#txtLoginEmail").val())
-                    if(resp=="Volantier")
-                        {
-                            localStorage.setItem("activeuser", $("#txtLoginEmail").val())
-                            window.location.href="/volDash";
-                        }
-
-                    if(resp =="Citizen")
-                        {
-                            localStorage.setItem("activeuser",$("#txtLoginEmail").val())
-                            window.location.href="/citizenDash"
-                        }
-
-                }).fail(function (err) {
-                    alert(err.message)
-                })
-            })
+        $(document).ready(function () {            
+           
 
         });
 
@@ -158,73 +198,86 @@
             width: 50px;
             margin-top: 2px;
         }
+
+        .navbar .btn {
+            margin-left: 10px;
+            border-radius: 20px;
+        }
+
+        .navbar-brand {
+            color: #fff !important;
+            font-weight: bold;
+        }
+
+        .section-heading {
+            background: linear-gradient(90deg, #ff416c, #ff4b2b);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .card:hover {
+            cursor: pointer;
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
     </style>
 </head>
-
-<body>
-
-  <!-- <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <body  style="background-color: #f5f7fb; 
+       font-family: 'Segoe UI', sans-serif;">
+<nav class="navbar navbar-expand-lg" style="background: linear-gradient(90deg, #0d6efd, #6610f2);">
     <div class="container-fluid">
 
-      <a class="navbar-brand" href="#">
-        <img src="../projPhotos/bagger logo.jpg" height="50px" width="50px"> Bagger Free Society
-      </a>
-      
-      <ul class="nav justify-content-end">
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Active</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-        </li>
-        </ul>
+        <!----------------- LOGO ------------->
+        <a class="navbar-brand fs-2 text-white" href="#">
+            <img src="../projPhotos/bagger logo.jpg" width="50" height="50">
+            Baggers Free Society
+        </a>
 
-    </div>
-  </nav> -->
+        <!---------------- TOGGLE BUTTON -------------- -->
+        <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
+        <!-------------- NAVBAR CONTENT ----------------->
+        <div class="collapse navbar-collapse justify-content-end" id="mainNavbar">
 
-
-
-
-
-
-
-    <nav class="navbar bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand fs-2" href="#">
-                <img src="../projPhotos/bagger logo.jpg" alt="Logo" width="50" height="50" class="d-inline-block align-text-top">
-                Baggers Free Society           
-            </a>           
-
-            <!-- --------------SIGNUP BUTTONS----------------- -->
-            <ul class="nav justify-content-end">
+            <ul class="navbar-nav align-items-center gap-2">
 
                 <li class="nav-item">
-                <a href="#bottom" class="btn btn-light text-dark">
-                Reach Us
-                </a>
-            </li>
-                
+                    <a href="#bottom" class="btn btn-light text-dark">
+                        Reach Us
+                    </a>
+                </li>
+
                 <li class="nav-item">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleSignupModal">
-                        SignUp
+                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#exampleSignupModal">
+                        Sign Up
                     </button>
                 </li>
-                
-                <li class="nav-item">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleLoginModal">
-                    Login
-                     </button>
-                </li>
-            </ul>
-    </nav>
 
+                <li class="nav-item">
+                    <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleLoginModal">
+                        Login
+                    </button>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
 
 
 <!------------------------------CAROUSEL------------------------------->
@@ -249,13 +302,14 @@
 </div>
 
 
-
+<div class="container">
 <div class="row">
-    <div class="col-md-12 fs-2 bg-danger text-white">
+    <div class="section-heading">
         <center>
              Our services
         </center>
     </div>
+</div>
 </div>
 
 <!----------------------------CARDS---------------------------->
@@ -322,19 +376,20 @@
 </div>
 </div>
 
-
+<div class="container">
 <div class="row">
-    <div class="col-md-12 fs-2 bg-danger text-white">
+    <div class="section-heading">
         <center>
-             Meet the Developer
+             Meet the Deviloper
         </center>
     </div>
+</div>
 </div>
 
 <div class="container">
 <div class="row">
     <div class="col-md-4 p-2">
-        <img src="..//projPhotos/developer.jpeg" height="350px" width="400px">
+        <img src="..//projPhotos/developer.jpeg" style="height:380px; width:400px; border-radius: 5% 5% 5% 5%;">
     </div>
 
     <div class="col-md-6">
@@ -353,27 +408,33 @@
 </div>
 </div>
 
+<div class="container">
 <div class="row">
-    <div class="col-md-12 fs-2 bg-danger text-white">
+    <div class="section-heading" id="bottom">
         <center>
              Reach us
         </center>
     </div>
 </div>
+</div>
 
+
+<!-------------------MAP---------------------->
 <div class="container">
 <div class="p-2" style="width: 100%; height: 300px;">
         <iframe width="100%" height="100%" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3447.8807340362614!2d74.94975317539755!3d30.211951274839702!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391732a4f07278a9%3A0x4a0d6293513f98ce!2sBanglore%20Computer%20Education!5e0!3m2!1sen!2sin!4v1766838454610!5m2!1sen!2sin" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
 </div>
 </div>
 
-
+<!-------------------FOOTER---------------------->
 <div class="row">
-    <div class="col-md-12 fs-5 bg-danger text-white" id="bottom">
-        <center>
-            © Copyright reserved
-        </center>
-    </div>
+  <div class="col-md-12"> 
+     <footer class="bg-dark text-white text-center py-3 mt-1">
+      <p>Driven by Passion</p>
+      <p> <h4>Thanks You For Visiting</h4></p>
+      <p class="mb-0">© 2026 Bagger Free Socity | Made For Baggers Help</p>
+    </footer>
+  </div>
 </div>
 
 
@@ -473,6 +534,6 @@
 
                 </div>
             </div>
-</body>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  </body>
 </html>

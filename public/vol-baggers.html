@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>All Beggers</title>
+    <title>All Beggers By this Volanteer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
 
      <link
@@ -20,41 +20,51 @@
     </script>
 
     <script>
-        var module=angular.module("beggerModule",[]);
-        module.controller("beggerController",function($scope,$http)
+        var module=angular.module("volBeggerModule",[]);
+        module.controller("volBeggerController",function($scope,$http)
         {
             $scope.jsonAry=[];
 
-            $scope.doFetchBeggers=function()
-                {
-                    $http.get("angular-fetchBeggers").then(allGood,errKuch)
-                    function allGood(result)
-                        {
-                            alert(JSON.stringify(result.data));
-                            $scope.jsonAry=result.data;
-                        }
+           $scope.doFetchVolBeggers=function()
+            {
+                let activeUser = localStorage.getItem("activeuser");
 
-                    function errKuch(err)
-                        {
-                            alert(err);
-                        }
+                alert("activeUser = " + activeUser);
+
+                $http.get("angular-fetchVolBeggers?volRefId=" + activeUser).then(allGood, errKuch)
+                function allGood(result)
+                {
+                    alert(JSON.stringify(result.data));
+                    $scope.jsonAry = result.data;
                 }
+
+                function errKuch(err)
+                {
+                    alert(JSON.stringify(err));
+                }
+            }
+
+            // $scope.getAge = function(dob) {
+            //     let birthDate = new Date(dob);
+            //     let age = new Date().getFullYear() - birthDate.getFullYear();
+            //     return age;
+            // }
         })
 
     </script>
 </head>
-<body ng-app="beggerModule" ng-controller="beggerController">
+<body ng-app="volBeggerModule" ng-controller="volBeggerController">
 
     <div class="container mt-2">
 
         <!-------------HEADING---------------->
         <div class="row bg-primary text-white text-center">
-            <h2>All Beggers Records</h2>
+            <h2>All Vol Beggers Records</h2>
         </div>
 
         <!--------------FETCH BTN----------------->
         <div class="text-center mt-2 mb-2">
-            <button class="btn btn-success" ng-click="doFetchBeggers()">Fetch Beggers</button>
+            <button class="btn btn-success" ng-click="doFetchVolBeggers()">Fetch Beggers</button>
         </div>
        
         <div class="table-responsive">
@@ -71,7 +81,7 @@
                         <td>{{$index+1}}</td>
                         <td>{{obj.volRefId}}</td>
                         <td>{{obj.baggName}}</td>
-                        <td>{{obj.baggDob}}</td>
+                        <td>{{obj.baggDob }}</td>    
                         <td>{{obj.baggGender}}</td>
                         <td>{{obj.baggAddress}}</td>
                         <td>{{obj.baggCity}}</td>

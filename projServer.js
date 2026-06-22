@@ -13,7 +13,7 @@ var mysql= require("mysql2");
 var cloudinary=require("cloudinary").v2;
  cloudinary.config({ 
             cloud_name: 'duil8nsbo', 
-            api_key: '817223246631413', 
+            api_key: '817223246631413',                 // cloudinary k liye hai
             api_secret: 'nC9514VjF7BQMgVhBmGwy0QmcfQ' // Click 'View API Keys' above to copy your API secret
         });
 
@@ -32,8 +32,8 @@ let portNo=2026;
 //--------------------------AI----------------------------------------------
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-                                        //add ur key
-const genAI = new GoogleGenerativeAI("AIzaSyAW8ojmMVgwq69bKeGcRlzcB3mga_-eVP8");
+                                        //add ur key from Aiven 
+const genAI = new GoogleGenerativeAI("AQ.Ab8RN6L4W7M9AABOk-4VO8f12oNPxbLdQks2yValCNW6I8ws0g");
 
 
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
@@ -90,6 +90,11 @@ app.get("/checkUtype",async function(req,resp)
         // console.log("email:",email); 
         // console.log("pwd:",pwd);
 
+        if(email == "admin@gmail.com" && pwd == "Admin123")
+        {
+            return resp.send("admin");
+        }
+        
         MysqlCon.query("select * from USERS where txtEmail=?",[email],async function(err,tableinJasonArray)
         {
             if(err)
@@ -172,9 +177,9 @@ app.post("/voluntier-login", async function(req,resp)
         MysqlCon.query("insert into volProfile values(?,?,?,?,?,?,?,?,?,?,?)",[email,name,number,address,city,gender,occu,adhar,profile,type,regNo],function(callBackerr)
         {
             if(callBackerr == null)
-                    resp.send("vol recored is saved");
+                 resp.redirect("/dash-vol-ngo.html?msg=success");
             else
-                resp.send(callBackerr.message)
+                 resp.redirect("/dash-vol-ngo.html?msg=error");
         })
 
     })
@@ -230,10 +235,9 @@ app.post("/doUpdate",async function(req,resp)
         MysqlCon.query("update volProfile set volName=?, volNumber=?, volAddress=?, volCity=?, volGender=?, volOccu=?,volAdhar=?, volProfilePic=?, volType=?, volNgoNo=? where volEmail=?",[name,number,address,city,gender,occu,adhar,profile,type,regNo,email],function(callBackerr)
         {
             if(callBackerr == null)
-                    resp.send("vol record Updated");
-
+                 resp.redirect("/dash-vol-ngo.html?msg=updateSuccess");
             else
-                resp.send(callBackerr.message);
+                resp.redirect("/dash-vol-ngo.html?msg=updateError");
         })
     })
 
@@ -313,83 +317,120 @@ app.post("/citizen-profile", async function(req,resp)
         MysqlCon.query("insert into citizenProfile values(?,?,?,?,?,?,?,?,?,?,?)",[front,back,email,number,name,adharNo,fatherName,dob,gender,address,city],function(callBackerr)
         {
             if(callBackerr == null)
-                    resp.send("citizen recored is saved");
+                    resp.redirect("/citizen-Dash.html?msg=success");
             else
-                resp.send(callBackerr.message)
+                resp.redirect("/citizen-Dash.html?msg=error");
         })
     })
 //------------------------------------------Begger Details page------------------------------------------
 
-app.get("/Bagger-Details",function(req,resp)
-    {
-        let fullPath=__dirname+"/public/detailsBegger.html";
-        resp.sendFile(fullPath);
-    })
-
-app.post("/Bagger-Details", async function(req,resp)
-    {
-        let jsonObjStr=JSON.stringify(req.body);
+app.post("/Bagger-Details", async function (req, resp) {
+    try {
         console.log(req.body);
 
-        let fileProof="NO_PIC.jpg";
-        let  aiJsonData;            //------------AI----------------
+        let fileProof = "NO_PIC.jpg";
+        let filePic = "NO_PIC.jpg";
+        let aiJsonData = null;
 
-        if(req.files!=null)
-        {
-            fileProof=req.files.baggFileProof.name;
-            let fullPath=__dirname+"/uploads/"+fileProof;
-            req.files.baggFileProof.mv(fullPath);
+        // =========================
+        // ✅ PROOF IMAGE
+        // =========================
+        if (req.files && req.files.baggFileProof) {
+            try {
+                let file1 = req.files.baggFileProof;
+                let path1 = __dirname + "/uploads/" + file1.name;
 
-            await cloudinary.uploader.upload(fullPath).then(async function(picUrlResult)
-                {
-                    fileProof=picUrlResult.url;
-                    console.log("Proof pic uploaded:",fileProof);
-                    aiJsonData=await aiHelper(picUrlResult.url);
-                })
+                await file1.mv(path1);
+
+                const result1 = await cloudinary.uploader.upload(path1);
+                fileProof = result1.url;
+
+                console.log("Proof uploaded:", fileProof);
+
+                // ✅ AI CALL SAFE
+                try {
+                    aiJsonData = await aiHelper(result1.url);
+                    console.log("AI DATA:", aiJsonData);
+                } catch (aiErr) {
+                    console.log("AI Error:", aiErr.message);
+                    aiJsonData = null;
+                }
+
+            } catch (err) {
+                console.log("Proof upload error:", err.message);
+            }
         }
 
-        let filePic="NO_PIC.jpg";
+        // =========================
+        // ✅ PROFILE IMAGE
+        // =========================
+        if (req.files && req.files.baggFilePic) {
+            try {
+                let file2 = req.files.baggFilePic;
+                let path2 = __dirname + "/uploads/" + file2.name;
 
-        if(req.files!=null)
-        {
-            filePic=req.files.baggFilePic.name;
-            let fullPath=__dirname+"/uploads/"+filePic;
-            req.files.baggFilePic.mv(fullPath);
+                await file2.mv(path2);
 
-            await cloudinary.uploader.upload(fullPath).then(function(picUrlResult)
-                {
-                    filePic=picUrlResult.url;
-                    console.log("bagger pic uploaded:",filePic);
-                })
+                const result2 = await cloudinary.uploader.upload(path2);
+                filePic = result2.url;
+
+                console.log("Profile uploaded:", filePic);
+
+            } catch (err) {
+                console.log("Profile upload error:", err.message);
+            }
         }
 
+        // =========================
+        // ✅ NORMAL DATA
+        // =========================
+        let email = req.body.volRefId || "";
+        let address = req.body.baggAddress || "";
+        let city = req.body.baggCity || "";
+        let work = req.body.baggWork || "";
+        let number = req.body.baggNumber || "";
 
-        let email=req.body.volRefId;
-        let address=req.body.baggAddress;
-        let city=req.body.baggCity;
-        let work=req.body.baggWork;
-        let number=req.body.baggNumber;
-        // let proof=req.body.baggProof;        //not needed
-        
-        let proofPic=fileProof;
-        let pic=filePic;
-        //---------------------------gettig by AI----------------------------------
-        let name=aiJsonData.name;
-        let dob=aiJsonData.dob;
-        let gender=aiJsonData.gender;
-        let proofNo=aiJsonData.adhaar_number;
+        // =========================
+        // ✅ AI SAFE DATA
+        // =========================
+        let name = "";
+        let dob = "";
+        let gender = "";
+        let proofNo = "";
 
+        if (aiJsonData) {
+            name = aiJsonData.name || "";
+            dob = aiJsonData.dob || "";
+            gender = aiJsonData.gender || "";
+            proofNo = aiJsonData.adhaar_number || "";
+        } else {
+            console.log("⚠️ AI data missing");
+        }
 
-        MysqlCon.query("insert into baggers values(?,?,?,?,?,?,?,?,?,?,?)",[email,name,dob,gender,address,city,work,number,proofNo,proofPic,pic],function(callBackerr)
-        {
-            if(callBackerr == null)
-                    resp.send("vol recored is saved");
-            else
-                resp.send(callBackerr.message)
-        })
-    })
-//--------------------------------------------------------------------------------------------------------------------
-async function aiHelper(imgurl)
+        // =========================
+        // ✅ INSERT INTO DB
+        // =========================
+        MysqlCon.query(
+            "insert into baggers values(?,?,?,?,?,?,?,?,?,?,?)",
+            [email, name, dob, gender, address, city, work, number, proofNo, fileProof, filePic],
+            function (err) {
+                if (err) {
+                    console.log("DB Error:", err.message);
+                    return resp.status(500).send(err.message);
+                }
+
+                resp.send("✅ Record Saved Successfully");
+            }
+        );
+
+    } catch (err) {
+        console.log("Server Error:", err.message);
+        resp.status(500).send("Something went wrong");
+    }
+    
+})
+
+ async function aiHelper(imgurl)
 {
 const myprompt = "Read the text on picture and tell all the information in adhaar card and give output STRICTLY in JSON format {adhaar_number:'', name:'', gender:'', dob: ''}. Dont give output as string."   
     const imageResp = await fetch(imgurl)
@@ -450,6 +491,147 @@ app.post("/picreader", async function (req, resp) {
 })
 
 
+
+
+// app.get("/Bagger-Details",function(req,resp)
+//     {
+//         let fullPath=__dirname+"/public/detailsBegger.html";
+//         resp.sendFile(fullPath);
+//     })
+
+// app.post("/Bagger-Details", async function(req,resp)
+//     {
+//         let jsonObjStr=JSON.stringify(req.body);
+//         console.log(req.body);
+
+//         let fileProof="NO_PIC.jpg";
+//         let  aiJsonData;            //------------AI----------------
+
+//         if(req.files!=null)
+//         {
+//             fileProof=req.files.baggFileProof.name;
+//             let fullPath=__dirname+"/uploads/"+fileProof;
+//             req.files.baggFileProof.mv(fullPath);
+
+//             try{await cloudinary.uploader.upload(fullPath).then(async function(picUrlResult)
+//                 {
+//                     fileProof=picUrlResult.url;
+//                     console.log("Proof pic uploaded:",fileProof);
+//                     aiJsonData=await aiHelper(picUrlResult.url);
+//                 })
+//             }
+//             catch{
+//                 console.log("error")
+//             }
+//         }
+
+//         let filePic="NO_PIC.jpg";
+
+//         if(req.files!=null)
+//         {
+//             filePic=req.files.baggFilePic.name;
+//             let fullPath=__dirname+"/uploads/"+filePic;
+//             req.files.baggFilePic.mv(fullPath);
+
+//             try{await cloudinary.uploader.upload(fullPath).then(function(picUrlResult)
+//                 {
+//                     filePic=picUrlResult.url;
+//                     console.log("bagger pic uploaded:",filePic);
+//                 })
+//             }
+
+//             catch{
+//                 console.log("eror");
+//             }
+//         }
+
+
+//         let email=req.body.volRefId;
+//         let address=req.body.baggAddress;
+//         let city=req.body.baggCity;
+//         let work=req.body.baggWork;
+//         let number=req.body.baggNumber;
+//         // let proof=req.body.baggProof;        //not needed
+        
+//         let proofPic=fileProof;
+//         let pic=filePic;
+//         //---------------------------gettig by AI----------------------------------
+//         let name=aiJsonData.name;
+//         let dob=aiJsonData.dob;
+//         let gender=aiJsonData.gender;
+//         let proofNo=aiJsonData.adhaar_number;
+
+
+//         MysqlCon.query("insert into baggers values(?,?,?,?,?,?,?,?,?,?,?)",[email,name,dob,gender,address,city,work,number,proofNo,proofPic,pic],function(callBackerr)
+//         {
+//             if(callBackerr == null)
+//                     resp.send("vol recored is saved");
+//             else
+//                 resp.send(callBackerr.message)
+//         })
+//     })
+// //--------------------------------------------------------------------------------------------------------------------
+// async function aiHelper(imgurl)
+// {
+// const myprompt = "Read the text on picture and tell all the information in adhaar card and give output STRICTLY in JSON format {adhaar_number:'', name:'', gender:'', dob: ''}. Dont give output as string."   
+//     const imageResp = await fetch(imgurl)
+//         .then((response) => response.arrayBuffer());
+
+//     const result = await model.generateContent([
+//         {
+//             inlineData: {
+//                 data: Buffer.from(imageResp).toString("base64"),
+//                 mimeType: "image/jpeg",
+//             },
+//         },
+//         myprompt,
+//     ]);
+//     console.log(result.response.text())
+            
+//             const cleaned = result.response.text().replace(/```json|```/g, '').trim();
+//             const jsonData = JSON.parse(cleaned);
+//             console.log(jsonData);
+
+//     return jsonData
+
+// }
+
+// app.post("/picreader", async function (req, resp) {
+//     let fileName;
+//     if (req.files != null) 
+//         {
+//        //const myprompt = "Read the text on picture and tell all the information";
+//         //  const myprompt = "Read the text on picture in JSON format";
+//         fileName = req.files.baggFileProof.name;
+//         let locationToSave = __dirname + "/public/uploads/" + fileName;//full ile path
+        
+//         req.files.baggFileProof.mv(locationToSave);//saving file in uploads folder
+        
+//         //saving ur file/pic on cloudinary server
+//         try{
+//         await cloudinary.uploader.upload(locationToSave).then(async function (picUrlResult) {
+           
+//             //sending pic to Gemini for reading
+//             let jsonData=await aiHelper( picUrlResult.url);
+            
+//             //use information from json for saving inside insert quiery
+//             resp.send(jsonData);
+
+//         });
+
+//         //var respp=await run("https://res.cloudinary.com/dfyxjh3ff/image/upload/v1747073555/ed7qdfnr6hez2dxoqxzf.jpg", myprompt);
+//         // resp.send(respp);
+//         // console.log(typeof(respp));
+//         }
+//         catch(err)
+//         {
+//             resp.send(err.message)
+//         }
+
+//     }
+// })
+
+
 //----------------------------------------Find Worker---------------------------------------------    
 app.get("/findWorkers",function(req,resp)
     {
@@ -500,34 +682,54 @@ app.get("/fetchWorkers",function(req,resp)
 
 
 //--------------------------------------setting modal in vol dashBoard------------------------------
-app.get("/updatePass",function(req,resp)
-    {
-        let email=req.query.settingEml;
-        let oldPass=req.query.oldPwd;
-        let newPass=req.query.newPwd;
+app.post("/updateVolPass", function(req, resp){
 
-        MysqlCon.query("select * from USERS where txtEmail=? and txtPwd=?",[email,oldPass],function(err,result)
-        {
-            if(err)
-                resp.send(err.message);
+    let email = req.body.settingEml;
+    let oldPwd = req.body.oldPwd;
+    let newPwd = req.body.newPwd;
 
-            else if(result.length==0)
-                resp.send("invail mail or pass");
+    if (!email || !oldPwd || !newPwd) {
+        return resp.send("All fields required");
+    }
 
-            else
-            {
-                MysqlCon.query("update USERS set txtPwd=? where txtEmail=?",[newPass,email],function(callBackerr)
-                  {
-                    if(callBackerr==null)
-                        resp.send("vol pass updated")
-                    else
-                        resp.send(callBackerr.message);
-                    })    
+    if (newPwd.length < 6) {
+        return resp.send("Password must be at least 6 characters");
+    }
+
+    MysqlCon.query(
+        "SELECT * FROM USERS WHERE txtEmail=?",
+        [email],
+        async function(err, result){
+
+            if (err) return resp.send(err.message);
+
+            if (result.length === 0) {
+                return resp.redirect("/dash-vol-ngo.html?msg=usernotfound");
             }
-        })
-        
 
-    })
+            let storedHash = result[0].txtPwd;
+
+            let match = await bcrypt.compare(oldPwd, storedHash);
+
+            if (!match) {
+                return resp.redirect("/dash-vol-ngo.html?msg=wrongold");
+            }
+
+            let newHash = await bcrypt.hash(newPwd, 10);
+
+            MysqlCon.query(
+                "UPDATE USERS SET txtPwd=? WHERE txtEmail=?",
+                [newHash, email],
+                function(error){
+                    if (error)
+                        resp.send(error.message);
+                    else
+                        resp.redirect("/dash-vol-ngo.html?msg=updated");
+                }
+            );
+        }
+    );
+});
 
 //--------------------------------------citizen dash--------------------------------------------
  app.get("/citizenDash",function(req,resp)     
@@ -535,36 +737,54 @@ app.get("/updatePass",function(req,resp)
         let fullPath=__dirname+"/public/citizen-Dash.html";
         resp.sendFile(fullPath);
     })
+app.post("/updateCitizenPass", function(req, resp){
 
-//-------------------------------------setting modal in citizen dashBoard---------------------
-app.get("/updateCitizenPass",function(req,resp)
-    {
-        let email=req.query.settingEml;
-        let oldPass=req.query.oldPwd;
-        let newPass=req.query.newPwd;
+    let email = req.body.settingEml;
+    let oldPass = req.body.oldPwd;
+    let newPass = req.body.newPwd;
 
-        MysqlCon.query("select * from USERS where txtEmail=? and txtPwd=?",[email,oldPass],function(err,result)
-        {
-            if(err)
-                resp.send(err.message);
+    if (!email || !oldPass || !newPass) {
+        return resp.redirect("/citizen-Dash.html?msg=allfields");
+    }
 
-            else if(result.length==0)
-                resp.send("invail mail or pass");
+    if (newPass.length < 6) {
+        return resp.redirect("/citizen-Dash.html?msg=shortpwd");
+    }
 
-            else
-            {
-                MysqlCon.query("update USERS set txtPwd=? where txtEmail=?",[newPass,email],function(callBackerr)
-                  {
-                    if(callBackerr==null)
-                        resp.send("vol pass updated")
-                    else
-                        resp.send(callBackerr.message);
-                    })    
+    MysqlCon.query(
+        "SELECT * FROM USERS WHERE txtEmail=?",
+        [email],
+        async function(err, result){
+
+            if (err) return resp.send(err.message);
+
+            if (result.length === 0) {
+                return resp.redirect("/citizen-Dash.html?msg=usernotfound");
             }
-        })
-        
 
-    })
+            let dbPwd = result[0].txtPwd;
+
+            let match = await bcrypt.compare(oldPass, dbPwd);
+
+            if (!match) {
+                return resp.redirect("/citizen-Dash.html?msg=wrongold");
+            }
+
+            let newHash = await bcrypt.hash(newPass, 10);
+
+            MysqlCon.query(
+                "UPDATE USERS SET txtPwd=? WHERE txtEmail=?",
+                [newHash, email],
+                function(err2){
+                    if (err2)
+                        resp.send(err2.message);
+                    else
+                        resp.redirect("/citizen-Dash.html?msg=updated");
+                }
+            );
+        }
+    );
+});
 
 //----------------------------------------------ADMIN DASHBOARD------------------------------------
 app.get("/adminDash",function(req,resp)
@@ -643,6 +863,27 @@ app.get("/angular-fetchBeggers",function(req,resp)
                 resp.send(tableInJsonArray);
             })
     })
+
+    app.get("/angular-fetchVolBeggers", function(req, resp)
+    {
+        let volRefId = req.query.volRefId;
+
+        console.log(volRefId)
+        MysqlCon.query(
+            "select * from baggers where volRefId=?",
+            [volRefId],
+            function(err, tableInJsonArray)
+            {
+                if(err)
+                {
+                    resp.send(err);
+                    return;
+                }
+
+                resp.send(tableInJsonArray);
+            }
+        );
+    });
 
 app.get("/angular-fetchVolantiers",function(req,resp)
    {

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Find Workers</title>
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
@@ -20,16 +20,18 @@
 
      <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
 
-     <script>   //---------------angular-----------------
+     <script>
+         
+    //-----------------------------ANGULAR----------------------------
         var module=angular.module("workerModule",[]);
         module.controller("workerController",function($scope,$http)
         {
             $scope.typeOfWorker=[];
             $scope.city=[];
             $scope.jsonAry=[];
-            $scope.selectedWorker = [];  //------------Selected worker details
+            $scope.selectedWorker = [];  //------------SELECTED WORKER DETAILS----------------
 
-            $scope.doGetData=function()//----------------woker and city--------
+            $scope.doGetData=function()//----------------WORKER AND CITY-----------------
                 {
                     $http.get("/getWorkerTypes").then(function(result)
                         {
@@ -42,7 +44,7 @@
                         })
                 }
 
-            $scope.doFind=function()    //---------------------find workers---------------
+            $scope.doFind=function()    //---------------------FIND WORKERS-----------------
                 {
                     var url="fetchWorkers?baggWork="+$scope.selWork+"&baggCity="+$scope.selCity;
 
@@ -60,7 +62,7 @@
                         }
                 }
 
-            $scope.showDetails = function(obj) {   //---------selected worker call------
+            $scope.showDetails = function(obj) {   //---------SELECTED WORKER CALL----------
             $scope.selectedWorker = obj;
             }
 
@@ -78,10 +80,10 @@
   </nav>
 
   <div class="container">
-<!-------------------------------buttons------------------------>
+<!-------------------------------BUTTONS------------------------>
 <div class="row mt-4">
     <div class="col-md-3">
-        <label class="form-label">Type of worker</label>
+        <label class="form-label fw-bold">Type of worker</label>
 
         <select class="form-select" ng-model="selWork">
             <option value="">Select Worker</option>
@@ -91,38 +93,38 @@
     </div>
 
     <div class="col-md-3">
-        <label class="form-label">City</label>
+        <label class="form-label fw-bold">City</label>
 
         <select class="form-select" ng-model="selCity">
-            <option>Select City</option>
+            <option value="">Select City</option>
             <option ng-repeat="obj in city" value="{{obj.baggCity}}">{{obj.baggCity}}</option>
         </select>
         
     </div>
 
     <div class="col-md-3">
-        <label>Find Worker</label>
+        <label class="fw-bold">Find Worker</label>
         <button type="button" class="btn btn-primary" ng-click="doFind()">Find</button>
     </div>
 </div>
 
-<!--------------------------------cards------------------------->
+<!--------------------------------CARDS------------------------->
 <div class="row mt-4">
     <div class="col-md-3" ng-repeat="obj in jsonAry"> <!--- ng-repeat=""-->
         <div class="card" > 
 
             <center>
-                <img src="../projPhotos/profile.jpg" style="width:100px" class="card-img-top">
+                <img ng-src="{{obj.baggFilePic}}" style="width:100px" class="card-img-top">
             </center>
 
                 <div class="card-text p-2">
                     <p>Name: {{obj.baggName}}</p>
-                    <p>Age: {{obj.baggAge}}</p>
+                    <p>Age: {{obj.baggDob}}</p>
                     <p>Gender: {{obj.baggGender}}</p>
                 </div>
 
                 <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal" ng-click="showDetails(obj)">Details</a>
-            </div>
+            </div>  
 
         </div>
     </div>
@@ -141,7 +143,7 @@
 
       <div class="modal-body">  <!----------Details------------>
             <p><b>Name:</b> {{selectedWorker.baggName}}</p>
-            <p><b>Age:</b> {{selectedWorker.baggAge}}</p>
+            <p><b>Age:</b> {{selectedWorker.baggDob}}</p>
             <p><b>Work:</b> {{selectedWorker.baggWork}}</p>
             <p><b>Gender:</b> {{selectedWorker.baggGender}}</p>
             <p><b>Address:</b> {{selectedWorker.baggAddress}}</p>

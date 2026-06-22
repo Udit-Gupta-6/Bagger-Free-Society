@@ -19,8 +19,62 @@
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous">
     </script>
+
+    <style>
+
+      body {
+            background: #f5f7fb;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Heading */
+        .dashboard-title {
+            background: linear-gradient(90deg, #ff416c, #ff4b2b);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-size: 28px;
+            font-weight: bold;
+            /* border-radius: 8px; */
+            /* margin: 20px 0; */
+            margin-bottom: 5px;
+        }
+
+      .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .card:hover {
+            cursor: pointer;
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+    </style>
+
+    <script>
+      $(document).ready(function()
+      {
+        $("logoutbtn").click(function()
+          {
+            localStorage.removeItem("activeuser");
+            location.href="index.html";
+          })
+      })
+    </script>
 </head>
 <body>
+
+<div class="dashboard-title">
+  <div class="col-md-12">
+      <center>
+        <span>Admin DashBoard</span>
+           </center>
+  </div>
+</div>
 
 <div class="container">
   <div class="row mt-1">
@@ -56,7 +110,7 @@
   <div class="row mt-1">
         <div class="col-md-4">
              <div class="card">
-                  <img src="../projPhotos/setting 2.jpeg" width="250px" height="250px" class="card-img-top" alt="...">
+                  <img src="../projPhotos/beggers pic.jpg" width="250px" height="250px" class="card-img-top" alt="...">
                      <div class="card-body text-center">
                         <a href="/beggers" id="btnBaggers" name="btnBaggers" class="btn btn-info">Beggers</a>
                      </div>
@@ -66,9 +120,11 @@
         <div class="col-md-4">
              <div class="card">
                   <img src="../projPhotos/logOut.jpeg" width="250px" height="250px" class="card-img-top" alt="...">
-                     <div class="card-body text-center">
-                        <a href="/"class="btn btn-info">Log out</a>
-                     </div>
+                    <div class="card-body text-center">
+                     <a href="/" id="logoutbtn" name="logoubtn" class="btn btn-primary rounded-pill px-4 py-2">
+                        Log Out
+                     </a>
+                    </div>
             </div>
         </div> 
   </div>

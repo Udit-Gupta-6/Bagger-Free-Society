@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Citizen DashBoard</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">  
@@ -20,8 +22,63 @@
       crossorigin="anonymous">
     </script>
 
+    <style>
+
+      .ok {
+      color: green;
+      font-weight: bold;
+       }
+
+      .not-ok{
+          color: red;
+          font-weight: bold;
+      }
+
+      body {
+            background: #f5f7fb;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+      .navbar-brand {
+            color: #fff !important;
+            font-weight: bold;
+        }
+
+      /* Heading */
+        .dashboard-title {
+            background: linear-gradient(90deg, #ff416c, #ff4b2b);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+      .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .card:hover {
+            cursor: pointer;
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+    </style>
+
+
     <script>
       $(document).ready(function(){              // <!-- AJAX-->
+
+          let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          let pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+
 
             $("#btnChange").click(function(){
 
@@ -44,6 +101,92 @@
                 });
 
             });
+
+      
+       $("logoutbtn").click(function()
+          {
+            localStorage.removeItem("activeuser");
+            location.href="index.html";
+          })
+
+          // --------------------------- EMAIL VALIDATION -----------------------------
+          $("#settingEml").blur(function()
+          {
+              let email = $(this).val();
+
+              if(emailRegex.test(email))
+                  $("#errSettingEmail").html("Valid")
+                  .addClass("ok")
+                  .removeClass("not-ok");
+              else
+                  $("#errSettingEmail").html("Invalid")
+                  .addClass("not-ok")
+                  .removeClass("ok");
+          });
+
+
+          // --------------------------- NEW PASSWORD VALIDATION ----------------------
+          $("#newPwd").blur(function()
+          {
+              let pwd = $(this).val();
+
+              if(pwdRegex.test(pwd))
+                  $("#errNewPwd").html("Valid")
+                  .addClass("ok")
+                  .removeClass("not-ok");
+              else
+                  $("#errNewPwd").html("Invalid")
+                  .addClass("not-ok")
+                  .removeClass("ok");
+          });
+
+
+          // --------------------------- OLD PASSWORD VALIDATION ----------------------
+          $("#oldPwd").blur(function()
+          {
+              let pwd = $(this).val();
+
+              if(pwdRegex.test(pwd))
+                  $("#errOldPwd").html("Valid")
+                  .addClass("ok")
+                  .removeClass("not-ok");
+              else
+                  $("#errOldPwd").html("Invalid")
+                  .addClass("not-ok")
+                  .removeClass("ok");
+          });
+
+           //----------------------------EYE ON PASSWORD------------------
+           $("#eyeOld").click(function()
+          {
+              if($("#oldPwd").prop("type")=="password")
+              {
+                  $("#oldPwd").prop("type","text");
+                  $("#eyeOld").addClass("fa-eye-low-vision").removeClass("fa-eye");
+              }
+              else
+              {
+                  $("#oldPwd").prop("type","password");
+                  $("#eyeOld").removeClass("fa-eye-low-vision").addClass("fa-eye");
+              }
+          });
+
+          $("#eyeNew").click(function()
+          {
+              if($("#newPwd").prop("type")=="password")
+              {
+                  $("#newPwd").prop("type","text");
+                  $("#eyeNew").addClass("fa-eye-low-vision").removeClass("fa-eye");
+              }
+              else
+              {
+                  $("#newPwd").prop("type","password");
+                  $("#eyeNew").removeClass("fa-eye-low-vision").addClass("fa-eye");
+              }
+          });
+
+
+        
         });
 
       $(document).ready(function(){ 
@@ -54,10 +197,10 @@
     </script>
 </head>
 <body>      <!------------------------ Navbar---------------------------------------->
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary" style="background :linear-gradient(90deg, #0d6efd, #6610f2);">
     <div class="container-fluid">
 
-      <a class="navbar-brand" href="#">
+      <a class="navbar-brand fs-2" href="#">
         <img src="../projPhotos/bagger logo.jpg" height="50px" width="50px"> Bagger Free Society
       </a>
       
@@ -65,10 +208,10 @@
     </div>
   </nav>
 
-<div class="row bg-danger text-white">
+<div class="dashboard-title">
   <div class="col-md-12">
       <center>
-        <span class="fs-3">Citizen DashBoard</span>
+        <span>Citizen DashBoard</span>
            </center>
     </div>    
 </div>
@@ -109,7 +252,7 @@
         <img src="../projPhotos/logOut.jpeg" width="250px" height="250px" class="card-img-top" alt="...">
           <div class="card-body text-center">
 
-            <a href="/" class="btn btn-primary rounded-pill px-4 py-2">
+            <a href="/" id="logoutbtn" name="logoubtn" class="btn btn-primary rounded-pill px-4 py-2">
                 Log Out
             </a>
 
@@ -129,7 +272,7 @@
   </div>
 </div>
 
-                      <!-----  setting modal------->   
+                      <!----------------------------  setting modal---------------->   
 <div class="modal fade" id="settingModal" tabindex="-1" aria-labelledby="exampleSettingModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -139,33 +282,88 @@
       </div>
       <div class="modal-body">
 
-      <form>                        
-        <div class="mb-3">
-            <label for="settingEml" class="form-label">Email address</label>
-            <input type="email" id="settingEml" name="settingEml" class="form-control" aria-describedby="emailHelp" required>
-            <div id=""></div>
+        <form action="/updateCitizenPass" method="post">                        
 
-    </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" id="settingEml" name="settingEml" class="form-control" required>
+              <span id="errSettingEmail"></span>  
+          </div>
 
-    <div class="mb-3">
-        <label for="oldPwd"  class="form-label">Old Password</label>
-        <input type="password" name="oldPwd "class="form-control" id="oldPwd" required>
-        <div class="err" id=""></div>
-    </div>
+          <div class="mb-3">
+              <label class="form-label">Old Password</label>
 
-     <div class="mb-3">
-        <label for="newPass" class="form-label">New Password</label>
-        <input type="password" name="newPwd" class="form-control" id="newPwd" required>
-        <div class="err" id=""></div>
-    </div>
+              <div class="input-group">
+                <input type="password" id="oldPwd" name="oldPwd" class="form-control" required>
 
-    <div class="text-center">
-        <button type="button" id="btnChange" class="btn btn-primary" >Change Password</button>      <!--using ajax-->
-    </div>
-</form>
+                <span class="input-group-text">
+                  <i class="fa-solid fa-eye" id="eyeOld"></i>
+                </span>
+              </div>
+
+              <span id="errOldPwd"></span>
+            </div>
+
+          <div class="mb-3">
+              <label class="form-label">New Password</label>
+
+              <div class="input-group">
+              <input type="password" id="newPwd" name="newPwd" class="form-control" required>
+
+                <span class="input-group-text">
+                 <i class="fa-solid fa-eye" id="eyeNew"></i>
+                </span>
+              </div>
+
+            <span id="errNewPwd"></span>
+        </div>
+
+
+          <div class="text-center">
+            <!--  must be submit -->
+            <button type="submit" class="btn btn-primary">
+              Change Password
+            </button>
+          </div>
+
+    </form>
         
       </div>
     </div>
   </div>
 </div>
 
+<script>
+  //----------------------------------------ALERT FOR RECORD SAVE OR NOT---------------------------
+  window.onload = function () {
+    let params = new URLSearchParams(window.location.search);
+    let msg = params.get("msg");
+
+    if (msg === "success") {
+        alert("Profile submitted successfully ✅");
+    }
+    else if (msg === "error") {
+        alert("Something went wrong ❌");
+    }
+    else if (msg === "updated") {
+        alert("Password Updated Successfully");
+    }
+    else if (msg === "wrongold") {
+        alert("Invalid Old Password");
+    }
+    else if (msg === "usernotfound") {
+        alert("User not found");
+    }
+    else if (msg === "allfields") {
+        alert("All fields are required");
+    }
+    else if (msg === "shortpwd") {
+        alert("Password must be at least 6 characters");
+    }
+
+    if (msg) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+};
+      
+</script>
